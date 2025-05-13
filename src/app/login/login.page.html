@@ -15,5 +15,6 @@
     <ion-input type="password" [(ngModel)]="contrasena" name="contrasena"></ion-input>
   </ion-item>
 
-  <ion-button expand="full" (click)="iniciarSesion()">Iniciar Sesión</ion-button>
+  <ion-button expand="full" id="iniciarSesion" (click)="iniciarSesion()">Iniciar Sesión</ion-button>
+  <ion-toast trigger="iniciarSesion" [message]="mensaje" duration="2000"></ion-toast>
 </ion-content>

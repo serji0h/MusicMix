@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonContent, IonHeader, IonTitle, IonToolbar, IonItem, IonLabel, IonButton, IonInput } from '@ionic/angular/standalone';
+import { IonContent, IonHeader, IonTitle, IonToolbar, IonItem, IonLabel, IonButton, IonInput, IonToast } from '@ionic/angular/standalone';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 
@@ -10,12 +10,13 @@ import { Router } from '@angular/router';
   templateUrl: './login.page.html',
   styleUrls: ['./login.page.scss'],
   standalone: true,
-  imports: [IonInput, IonButton, IonLabel, IonItem, IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule]
+  imports: [IonToast, IonInput, IonButton, IonLabel, IonItem, IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule]
 })
 
 export class LoginPage implements OnInit {
   email: string = '' ;
   contrasena: string = '';
+  mensaje: "Error al iniciar sesión" | "Usuario no encontrado" | "Se ha Iniciado Sesión" = "Error al iniciar sesión";
   constructor(private http:HttpClient, private router:Router) { }
 
   ngOnInit() {
@@ -33,12 +34,16 @@ export class LoginPage implements OnInit {
 
         if (usuario) {
           console.log('Usuario encontrado:', usuario);
+          this.mensaje = "Se ha Iniciado Sesión";
+
           this.router.navigate(['/tabs']);
         } else {
           console.error('Usuario no encontrado');
+          this.mensaje = "Usuario no encontrado";
         }
       },
       error: (error) => {
+        this.mensaje = "Error al iniciar sesión";
         console.error("Error al obtener al usuario", error);
       }
     });
