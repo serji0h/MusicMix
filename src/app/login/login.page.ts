@@ -16,13 +16,15 @@ import { Router } from '@angular/router';
 export class LoginPage implements OnInit {
   email: string = '' ;
   contrasena: string = '';
-  mensaje: "Error al iniciar sesión" | "Usuario no encontrado" | "Se ha Iniciado Sesión" = "Error al iniciar sesión";
+  mensaje = "";
   constructor(private http:HttpClient, private router:Router) { }
 
   ngOnInit() {
     // para saber si luego puede implementar algo para hacer que compruebe si ya se habia logeado
   }
-
+  easyLogin(){
+    this.router.navigate(['/tabs']);
+  }
   iniciarSesion() {
     console.log('Iniciando sesión con:', this.email, this.contrasena);
 
@@ -43,7 +45,7 @@ export class LoginPage implements OnInit {
         }
       },
       error: (error) => {
-        this.mensaje = "Error al iniciar sesión";
+        //this.mensaje = "Error al iniciar sesión";
         console.error("Error al obtener al usuario", error);
       }
     });

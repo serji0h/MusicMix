@@ -1,18 +1,30 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-title>
-      Tab 1
+      Canciones
     </ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Tab 1</ion-title>
-    </ion-toolbar>
-  </ion-header>
 
-  <app-explore-container name="Tab 1 page"></app-explore-container>
-  <ion-searchbar></ion-searchbar>
+  <ion-searchbar (ionInput)="searchSongs($event)"></ion-searchbar>
+
+  <!--IF IS WEB-->
+  <div *ngIf="!isMobile">
+    <input type="file" (change)="directorySelected($event)" webKitdirectory directory multiple/>
+  </div>
+
+
+  <ion-list>
+    <ion-item *ngFor="let song of songsSearched">
+      <ion-thumbnail slot="start">
+        <img src="assets/cover/image.png" alt="Song Cover"/>
+      </ion-thumbnail>
+      <ion-label>
+       <h6>{{song}}</h6>
+      </ion-label>
+    </ion-item>
+  </ion-list>
+
 </ion-content>
