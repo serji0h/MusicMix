@@ -2,61 +2,56 @@ import { Injectable } from '@angular/core';
 import { Capacitor } from '@capacitor/core';
 import { Directory, Filesystem } from '@capacitor/filesystem';
 
+export interface Song {
+  name: string;
+  path: string;
+}
 
 @Injectable({
   providedIn: 'root',
 })
 export class MusicService {
-  songsWeb: string[] = [];
-  constructor() { }
+  songsWeb: Song[] = [];
 
-async listSongs(): Promise<string[]> {
-    if(Capacitor.isNativePlatform()){
+  constructor() {}
+
+  async listSongs(): Promise<Song[]> {
+    if (Capacitor.isNativePlatform()) {
       return this.getMusicFiles();
-    }else{
+    } else {
       return this.songsWeb;
     }
   }
 
-  // async getMusicFiles(): Promise<string[]> {
-  //   try {
-  //     const result = await Filesystem.readdir({
-  //       directory: Directory.External,
-  //       path: 'Music',
-  //     });
-  //     return result.files
-  //     .filter(file => typeof file === 'string' && ((file as string).endsWith('.mp3') || (file as string).endsWith('.wav') || (file as string).endsWith('.flac')))
-  //     .map(file => `Music/${file}`);
-
-  //   }
-  //   catch (error) {
-  //     console.error('Error leyendo directorio:', error);
-  //     return [];
-  //   }
-  // }
-
-  // addSongsWeb(files:FileList){
-  //   //this.songsWeb.push(nombre);
-  //   for (const file of Array.from(files)) {
-  //     this.songsWeb.push(file.name);
-  //   }
-
-  // }
-
-
   async getMusicFiles(): Promise<any[]> {
     try {
       const result = await Filesystem.readdir({
-        directory: Directory.ExternalStorage, // También probaremos otra opción
+        directory: Directory.ExternalStorage,
         path: 'Music',
       });
 
-      return result.files;
+      const files = await Promise.all(
+        result.files
+          .filter((file: any) =>
+            file.name && (file.name.endsWith('.mp3') || file.name.endsWith('.wav') || file.name.endsWith('.flac'))
+          )
+          .map(async (file: any) => {
+            const fileUri = await Filesystem.getUri({
+              directory: Directory.ExternalStorage,
+              path: `Music/${file.name}`
+            });
+            return {
+              name: file.name,
+              path: fileUri.uri
+            };
+          })
+      );
+
+      return files;
     } catch (error) {
       console.error('Error leyendo directorio (External):', error);
       return [];
     }
   }
-
 
 }

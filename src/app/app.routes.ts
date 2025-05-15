@@ -41,5 +41,9 @@ export const routes: Routes = [
         pathMatch: 'full',
       }
     ]
+  },
+  {
+    path: 'music-player',
+    loadComponent: () => import('./music-player/music-player.page').then( m => m.MusicPlayerPage)
   }
 ];

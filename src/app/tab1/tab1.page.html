@@ -7,24 +7,21 @@
 </ion-header>
 
 <ion-content [fullscreen]="true">
-
   <ion-searchbar (ionInput)="searchSongs($event)"></ion-searchbar>
 
   <!--IF IS WEB-->
   <div *ngIf="!isMobile">
-    <input type="file" (change)="directorySelected($event)" webKitdirectory directory multiple/>
+    <input type="file" (change)="directorySelected($event)" webkitdirectory directory multiple />
   </div>
 
-
   <ion-list>
-    <ion-item *ngFor="let song of songsSearched">
+    <ion-item *ngFor="let song of songsSearched" (click)="openPlayer(song)">
       <ion-thumbnail slot="start">
         <img src="assets/cover/image.png" alt="Song Cover"/>
       </ion-thumbnail>
       <ion-label>
-       <h6>{{song}}</h6>
+        <h6>{{song.name}}</h6>
       </ion-label>
     </ion-item>
   </ion-list>
-
 </ion-content>
