@@ -1,95 +1,76 @@
 import { Component } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { IonHeader, IonRange, IonButton, IonButtons, IonToolbar, IonBackButton, IonTitle, IonContent, IonIcon } from "@ionic/angular/standalone";
-import { add, pauseOutline, playOutline, playSkipForwardOutline, playSkipBackOutline } from 'ionicons/icons';
+import { MusicPlayerService } from '../services/music-player.service';
+import { IonHeader, IonToolbar, IonButtons, IonBackButton, IonTitle, IonContent, IonRange, IonButton, IonIcon } from "@ionic/angular/standalone";
 import { addIcons } from 'ionicons';
-
+import { playOutline, pauseOutline, playSkipForwardOutline, playSkipBackOutline } from 'ionicons/icons';
 @Component({
-  standalone: true,
   selector: 'app-music-player',
   templateUrl: './music-player.page.html',
   styleUrls: ['./music-player.page.scss'],
-  imports: [IonIcon, IonContent, IonTitle, IonHeader, IonRange, IonButton, IonButtons, IonToolbar, IonBackButton, CommonModule, FormsModule],
+  standalone: true,
+  imports: [IonIcon, IonButton, IonRange, IonContent, IonTitle, IonBackButton, IonButtons, IonToolbar, IonHeader, /* tus imports standalone */]
 })
 export class MusicPlayerPage {
-  songName: string = '';
-  songPath: string = '';
-  static audioBefore: HTMLAudioElement | null = null; // para guardar el audion anteriro, que si no suenan todos los que se hayan abierto
-  audio: HTMLAudioElement | null = null;
-  isPlaying: boolean = false;
-  currentTime: number = 0;
-  duration: number = 0;
+  songName = '';
+  songPath = '';
+  isPlaying = false;
+  currentTime = 0;
+  duration = 0;
 
-  constructor(private route: ActivatedRoute) {
+  constructor(
+    private route: ActivatedRoute,
+    private player: MusicPlayerService
+  ) {
     addIcons({ playOutline, pauseOutline, playSkipForwardOutline, playSkipBackOutline });
-  }
 
-  ngOnInit() {
-    this.route.queryParams.subscribe(params => {
-      this.songName = params['name'];
-      this.songPath = params['path'];
-      this.loadSong();
-    });
-  }
-
-  loadSong() {
-    // SI EXISTE UN AUDIO ANTERIOR, LO PARAMOS
-    if (MusicPlayerPage.audioBefore) {
-      MusicPlayerPage.audioBefore.pause();
-      MusicPlayerPage.audioBefore.currentTime = 0;
-      MusicPlayerPage.audioBefore = null;
     }
 
-    // Creamos el nuevo audio
-    this.audio = new Audio(this.songPath);
-    MusicPlayerPage.audioBefore = this.audio;
+  ngOnInit() {
+    this.route.queryParams.subscribe(async params => {
+      this.songName = params['name'];
+      this.songPath = params['path'];
+      await this.player.play(this.songPath);
+      this.isPlaying = true;
 
-    this.audio.addEventListener('loadedmetadata', () => {
-      this.duration = this.audio?.duration || 0;
+      // solo para web: obtener duración
+      setTimeout(async () => {
+        this.duration = await this.player.getDuration();
+      }, 1000);
     });
 
-    this.audio.addEventListener('timeupdate', () => {
-      this.currentTime = this.audio?.currentTime || 0;
-    });
-
-    this.audio.play();
-    this.isPlaying = true;
+    // actualizar tiempo cada segundo (web)
+    setInterval(async () => {
+      if (this.isPlaying) {
+        this.currentTime = await this.player.getCurrentTime();
+      }
+    }, 1000);
   }
 
   togglePlay() {
-    if (!this.audio) return;
-
     if (this.isPlaying) {
-      this.audio.pause();
+      this.player.pause();
     } else {
-      this.audio.play();
+      this.player.resume();
     }
     this.isPlaying = !this.isPlaying;
   }
 
   seekTo(event: any) {
-    if (this.audio) {
-      this.audio.currentTime = event.detail.value;
-    }
+    this.player.seekTo(event.detail.value);
   }
 
   skipBack() {
-    if (this.audio) {
-      this.audio.currentTime = Math.max(0, this.audio.currentTime - 10);
-    }
+    this.player.seekTo(Math.max(0, this.currentTime - 10));
   }
 
   skipForward() {
-    if (this.audio) {
-      this.audio.currentTime = Math.min(this.duration, this.audio.currentTime + 10);
-    }
+    this.player.seekTo(Math.min(this.duration, this.currentTime + 10));
   }
 
   formatTime(seconds: number): string {
-    const minutes = Math.floor(seconds / 60);
-    const secs = Math.floor(seconds % 60);
-    return `${minutes}:${secs < 10 ? '0' + secs : secs}`;
+    const min = Math.floor(seconds / 60);
+    const sec = Math.floor(seconds % 60);
+    return `${min}:${sec < 10 ? '0' + sec : sec}`;
   }
 }

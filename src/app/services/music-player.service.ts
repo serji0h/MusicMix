@@ -1,43 +1,70 @@
 import { Injectable } from '@angular/core';
-import { NativeAudio } from '@capacitor-community/native-audio';
 import { Capacitor } from '@capacitor/core';
+import { NativeAudio } from '@capacitor-community/native-audio';
 
 @Injectable({
   providedIn: 'root'
 })
 export class MusicPlayerService {
-  private currentAudioId = 'Music';
+  private webAudio: HTMLAudioElement | null = null;
+  private currentAssetId = 'current-song';
 
-  constructor() {}
+  async play(path: string) {
+    if (Capacitor.getPlatform() === 'web') {
+      this.webAudio?.pause();
+      this.webAudio = new Audio(path);
+      await this.webAudio.play();
+    } else {
+      try {
+        await NativeAudio.unload({ assetId: this.currentAssetId }).catch(() => {});
+        await NativeAudio.preload({
+          assetId: this.currentAssetId,
+          assetPath: encodeURI(path),
+          isUrl: true
+        });
+        await NativeAudio.play({ assetId: this.currentAssetId });
+      } catch (e) {
+        console.error('Error al reproducir en nativo:', e);
+      }
+    }
+  }
 
-  // async playMusic(path: string) {
+  pause() {
+    if (Capacitor.getPlatform() === 'web') {
+      this.webAudio?.pause();
+    } else {
+      NativeAudio.pause({ assetId: this.currentAssetId }).catch(console.error);
+    }
+  }
 
-  //   if (Capacitor.isNativePlatform()) {
-  //     try {
-  //       await NativeAudio.unload({ assetId: this.currentAudioId });
-  //     } catch (error) {
-  //       //si no carga simplemente no hace nada
-  //     }
+  resume() {
+    if (Capacitor.getPlatform() === 'web') {
+      this.webAudio?.play();
+    } else {
+      NativeAudio.resume({ assetId: this.currentAssetId }).catch(console.error);
+    }
+  }
 
-  //     await NativeAudio.preload({
-  //       assetId: this.currentAudioId,
-  //       assetPath: path,
-  //       isUrl: true
-  //     });
+  stop() {
+    if (Capacitor.getPlatform() === 'web') {
+      this.webAudio?.pause();
+      if (this.webAudio) this.webAudio.currentTime = 0;
+    } else {
+      NativeAudio.stop({ assetId: this.currentAssetId }).catch(console.error);
+    }
+  }
 
-  //     await NativeAudio.play({ assetId: this.currentAudioId });
-  //   } else {
-  //     const audio = new Audio(path);
-  //     audio.play();
-  //   }
-  // }
+  seekTo(seconds: number) {
+    if (Capacitor.getPlatform() === 'web' && this.webAudio) {
+      this.webAudio.currentTime = seconds;
+    }
+  }
 
-  // async stopMusic() {
-  //   if (Capacitor.isNativePlatform()) {
-  //     await NativeAudio.stop({ assetId: this.currentAudioId });
-  //     await NativeAudio.unload({ assetId: this.currentAudioId });
-  //   } else {
-  //     // Lógica para detener el audio en la web
-  //   }
-  // }
+  async getCurrentTime(): Promise<number> {
+    return Capacitor.getPlatform() === 'web' ? (this.webAudio?.currentTime || 0) : 0;
+  }
+
+  async getDuration(): Promise<number> {
+    return Capacitor.getPlatform() === 'web' ? (this.webAudio?.duration || 0) : 0;
+  }
 }

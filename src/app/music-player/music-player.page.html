@@ -1,30 +1,28 @@
-<ion-header [translucent]="true">
+<ion-header>
   <ion-toolbar>
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/tabs/tab1"></ion-back-button>
     </ion-buttons>
-    <ion-title>Reproductor de Música</ion-title>
+    <ion-title>{{ songName }}</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true" class="music-player">
-  <div class="album-art">
-    <img src="assets/cover/image.png" alt="Song Cover" />
-  </div>
+<ion-content class="ion-padding">
+  <div class="player-container">
+    <img src="assets/cover/image.png" alt="cover" class="cover-image" />
 
-  <div class="song-info">
-    <h2>{{ songName }}</h2>
+    <ion-range
+      [value]="currentTime"
+      [max]="duration"
+      (ionChange)="seekTo($event)"
+    ></ion-range>
 
-  </div>
-
-  <div class="controls-container">
-    <ion-range [(ngModel)]="currentTime" [min]="0" [max]="duration" (ionChange)="seekTo($event)"></ion-range>
     <div class="time-info">
       <span>{{ formatTime(currentTime) }}</span>
       <span>{{ formatTime(duration) }}</span>
     </div>
 
-    <div class="buttons">
+    <div class="controls">
       <ion-button fill="clear" (click)="skipBack()">
         <ion-icon name="play-skip-back-outline"></ion-icon>
       </ion-button>
