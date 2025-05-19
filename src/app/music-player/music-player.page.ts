@@ -1,9 +1,9 @@
-import { Component, inject } from '@angular/core';
+import { Component } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonHeader, IonRange, IonButton, IonButtons, IonToolbar, IonBackButton, IonTitle, IonContent, IonIcon } from "@ionic/angular/standalone";
-import { add, pauseOutline, playOutline } from 'ionicons/icons';
+import { add, pauseOutline, playOutline, playSkipForwardOutline, playSkipBackOutline } from 'ionicons/icons';
 import { addIcons } from 'ionicons';
 
 @Component({
@@ -16,16 +16,15 @@ import { addIcons } from 'ionicons';
 export class MusicPlayerPage {
   songName: string = '';
   songPath: string = '';
+  static audioBefore: HTMLAudioElement | null = null; // para guardar el audion anteriro, que si no suenan todos los que se hayan abierto
   audio: HTMLAudioElement | null = null;
   isPlaying: boolean = false;
   currentTime: number = 0;
   duration: number = 0;
 
   constructor(private route: ActivatedRoute) {
-    addIcons({ playOutline, pauseOutline })
+    addIcons({ playOutline, pauseOutline, playSkipForwardOutline, playSkipBackOutline });
   }
-
-
 
   ngOnInit() {
     this.route.queryParams.subscribe(params => {
@@ -36,12 +35,17 @@ export class MusicPlayerPage {
   }
 
   loadSong() {
-    if (this.audio) {
-      this.audio.pause();
-      this.audio = null;
+    // SI EXISTE UN AUDIO ANTERIOR, LO PARAMOS
+    if (MusicPlayerPage.audioBefore) {
+      MusicPlayerPage.audioBefore.pause();
+      MusicPlayerPage.audioBefore.currentTime = 0;
+      MusicPlayerPage.audioBefore = null;
     }
 
+    // Creamos el nuevo audio
     this.audio = new Audio(this.songPath);
+    MusicPlayerPage.audioBefore = this.audio;
+
     this.audio.addEventListener('loadedmetadata', () => {
       this.duration = this.audio?.duration || 0;
     });

@@ -10,7 +10,7 @@ import { Router } from '@angular/router';
   selector: 'app-tab1',
   templateUrl: 'tab1.page.html',
   styleUrls: ['tab1.page.scss'],
-  imports: [IonLabel, IonItem, IonList, IonHeader, IonToolbar, IonTitle, IonContent, ExploreContainerComponent, IonSearchbar, CommonModule, IonThumbnail],
+  imports: [IonLabel, IonItem, IonList, IonHeader, IonToolbar, IonTitle, IonContent, IonSearchbar, CommonModule, IonThumbnail],
 })
 export class Tab1Page {
   songs: Song[] = [];

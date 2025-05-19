@@ -8,12 +8,13 @@
 </ion-header>
 
 <ion-content [fullscreen]="true" class="music-player">
-  <div class="cover-container">
-    <img src="assets/cover/image.png" alt="Song Cover" class="cover-img" />
+  <div class="album-art">
+    <img src="assets/cover/image.png" alt="Song Cover" />
   </div>
 
-  <div class="info-container">
-    <h2>{{ songName || 'Sin canción seleccionada' }}</h2>
+  <div class="song-info">
+    <h2>{{ songName }}</h2>
+
   </div>
 
   <div class="controls-container">
@@ -25,7 +26,7 @@
 
     <div class="buttons">
       <ion-button fill="clear" (click)="skipBack()">
-        <ion-icon name="play-back-outline"></ion-icon>
+        <ion-icon name="play-skip-back-outline"></ion-icon>
       </ion-button>
 
       <ion-button fill="clear" (click)="togglePlay()">
@@ -33,7 +34,7 @@
       </ion-button>
 
       <ion-button fill="clear" (click)="skipForward()">
-        <ion-icon name="play-forward-outline"></ion-icon>
+        <ion-icon name="play-skip-forward-outline"></ion-icon>
       </ion-button>
     </div>
   </div>

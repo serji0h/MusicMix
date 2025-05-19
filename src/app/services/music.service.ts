@@ -23,7 +23,7 @@ export class MusicService {
     }
   }
 
-  async getMusicFiles(): Promise<any[]> {
+  async getMusicFiles(): Promise<Song[]> {
     try {
       const result = await Filesystem.readdir({
         directory: Directory.ExternalStorage,
@@ -36,13 +36,10 @@ export class MusicService {
             file.name && (file.name.endsWith('.mp3') || file.name.endsWith('.wav') || file.name.endsWith('.flac'))
           )
           .map(async (file: any) => {
-            const fileUri = await Filesystem.getUri({
-              directory: Directory.ExternalStorage,
-              path: `Music/${file.name}`
-            });
+            const fileUri = `file:///storage/emulated/0/Music/${file.name}`; // Ruta absoluta
             return {
               name: file.name,
-              path: fileUri.uri
+              path: fileUri
             };
           })
       );
