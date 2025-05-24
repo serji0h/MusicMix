@@ -12,10 +12,11 @@
     <img src="assets/cover/image.png" alt="cover" class="cover-image" />
 
     <ion-range
-      [value]="currentTime"
+      min="0"
       [max]="duration"
-      (ionChange)="seekTo($event)"
-    ></ion-range>
+      [value]="currentTime"
+      (ionChange)="onSeek($event)">
+    </ion-range>
 
     <div class="time-info">
       <span>{{ formatTime(currentTime) }}</span>
