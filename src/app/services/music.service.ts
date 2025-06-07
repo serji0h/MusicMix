@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Capacitor } from '@capacitor/core';
 import { Directory, Filesystem } from '@capacitor/filesystem';
 import { NativeAudio } from '@capacitor-community/native-audio';
-import { ApiService, Song } from './api-service.service';
+import { ApiService, Song, Playlist } from './api-service.service';
 
 // export interface Song {
 //   name: string;
@@ -15,6 +15,8 @@ import { ApiService, Song } from './api-service.service';
 })
 export class MusicService {
   songsWeb: Song[] = [];
+  private userId: number | null = null; // Almacena el ID del usuario autenticado
+  private PlaylistsWeb: Playlist[] = [];
 
   constructor(private apiService: ApiService) {}
 
@@ -65,15 +67,18 @@ export class MusicService {
             const { title, artist } = this.extractMetadataFromName(file.name);
             //como no se puede obtener el album, se pone un valor por defecto
             const album = 'Unknown Album';
+            let songId: number | undefined;
 
             try {
-              await this.apiService.createOrGetSong(title, artist, album).toPromise();
+              const response = await this.apiService.createOrGetSong(title, artist, album).toPromise();
+              songId = response.id; //asigna el id de la cancion
             } catch (error) {
-              console.error(`Error enviando ${file.name} al backend:`, error);
+              console.error(`el titulo es este ${title} con artista ${artist}`);
+              console.error(`Error enviando ${file.name} al backend:`,error);
             }
             return {
-              id: undefined, //no necesitamos el id para listado
-              name: file.name,
+              id: songId, //no necesitamos el id para listado
+              nombre: file.name,
               path: fileUri,
               duration,
               title,
@@ -111,4 +116,6 @@ export class MusicService {
       };
     }
   }
+
+
 }

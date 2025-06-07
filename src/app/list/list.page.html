@@ -1,0 +1,34 @@
+<!-- <ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>list</ion-title>
+  </ion-toolbar>
+</ion-header> -->
+
+<ion-content [fullscreen]="true">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">list</ion-title>
+    </ion-toolbar>
+  </ion-header>
+</ion-content>
+<!-- contenido de la playlists -->
+<ion-header>
+  <ion-toolbar>
+    <ion-title>{{ nombre }}</ion-title>
+  </ion-toolbar>
+  <img src="../../assets/cover/default-playlist.png" alt="Playlist Cover" style="width: 150px; height: 150px; margin: 10px auto; display: block;" />
+  <div class="button">
+    <button expand="block" (click)="showAddSongs()" [routerLink]="['/tab1']" routerLinkActive="router-link-active" >
+      <!-- <ion-icon name="add" slot="start"></ion-icon> -->
+      + Añadir Canciones
+    </button>
+  </div>
+
+</ion-header>
+
+<!-- Canciones de la lista -->
+<ion-list>
+  <ion-item *ngFor="let song of songs" (click)="(song)">
+    <ion-label (click)="openPlayer(song)" >{{ song.nombre }}</ion-label>
+  </ion-item>
+</ion-list>

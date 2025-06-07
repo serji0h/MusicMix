@@ -1,17 +1,39 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>
-      Tab 3
-    </ion-title>
+    <ion-title>Mis Listas de Reproducción</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Tab 3</ion-title>
-    </ion-toolbar>
-  </ion-header>
+  <!-- Botón para crear lista -->
+  <ion-button expand="block" (click)="createPlaylist()">
+    <ion-icon name="add" slot="start"></ion-icon>
+    Crear Nueva Lista
+  </ion-button>
 
-  <app-explore-container name="Tab 3 page"></app-explore-container>
+
+  <div class="playlists-container">
+  <!-- Lista de reproducción como tarjetas -->
+   <div class ="playlists-grid" *ngFor="let playlist of playlists">
+    <ion-card  (click)="selectPlaylist(playlist)">
+      <ion-card-header>
+        <ion-card-title>{{ playlist.nombre }}</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <img [src]="playlist.imagen" alt="Playlist Cover" style="width: 100px; height: 100px;" />
+      </ion-card-content>
+    </ion-card>
+   </div>
+
+  </div>
+
+  <!-- Vista para añadir canciones -->
+  <ion-list *ngIf="showAddSongs">
+    <ion-item *ngFor="let song of songs">
+      <ion-label>{{ song.nombre }}</ion-label>
+      <ion-button slot="end" (click)="addSongToPlaylist(song)">
+        <ion-icon name="add"></ion-icon>
+      </ion-button>
+    </ion-item>
+  </ion-list>
 </ion-content>

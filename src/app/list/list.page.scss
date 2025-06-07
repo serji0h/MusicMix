@@ -1,0 +1,19 @@
+button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgb(47, 111, 206);
+  color: white;
+  height: 50px;
+  width: max-content;
+  padding: 10px 20px;
+  border-radius: 100px;
+  font-size: large;
+  gap: 10px; //espacio entre iconi y texto
+}
+
+.button {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 30px;
+}

@@ -1,25 +1,30 @@
+import { addIcons} from 'ionicons';
 import { CommonModule } from '@angular/common';
 import { MusicService } from '../services/music.service';
 import { Component } from '@angular/core';
-import { IonHeader, IonToolbar, IonTitle, IonContent, IonSearchbar, IonList, IonItem, IonLabel, IonThumbnail } from '@ionic/angular/standalone';
-import { ExploreContainerComponent } from '../explore-container/explore-container.component';
+import { IonHeader, IonToolbar, IonTitle, IonContent, IonSearchbar, IonList, IonItem, IonLabel, IonThumbnail, IonButton, IonIcon, ActionSheetController } from '@ionic/angular/standalone';
 import { Capacitor } from '@capacitor/core';
 import { Router } from '@angular/router';
-import { ApiService, Song } from '../services/api-service.service';
+import { ApiService, Song, Playlist } from '../services/api-service.service';
+import { addCircleOutline } from 'ionicons/icons';
+
 
 @Component({
   selector: 'app-tab1',
   templateUrl: 'tab1.page.html',
   styleUrls: ['tab1.page.scss'],
-  imports: [IonLabel, IonItem, IonList, IonHeader, IonToolbar, IonTitle, IonContent, IonSearchbar, CommonModule, IonThumbnail],
+  imports: [IonIcon, IonLabel, IonItem, IonList, IonHeader, IonToolbar, IonTitle, IonContent, IonSearchbar, CommonModule, IonThumbnail],
 })
 export class Tab1Page {
   songs: Song[] = [];
+  playlists: Playlist[] = [];
   search: string = '';
   songsSearched: Song[] = [];
   isMobile: boolean = Capacitor.isNativePlatform();
 
-  constructor(private musicService: MusicService, private apiService: ApiService, private router: Router) {}
+  constructor(private musicService: MusicService, private apiService: ApiService, private router: Router, public actionSheetCtrl: ActionSheetController, private ApiService: ApiService) {
+    addIcons({addCircleOutline})
+  }
 
   async ngOnInit() {
     this.songs = await this.musicService.listSongs();
@@ -29,7 +34,7 @@ export class Tab1Page {
   searchSongs(event: any) {
     const searchTerm = event.target.value.toLowerCase();
     this.songsSearched = this.songs.filter((song) =>
-      song.name.toLowerCase().includes(searchTerm)
+      song.nombre.toLowerCase().includes(searchTerm)
     );
   }
 
@@ -54,39 +59,99 @@ export class Tab1Page {
         const path = URL.createObjectURL(file);
         const duration = await this.getAudioDuration(file);
 
-        // Extraer metadatos para enviar al backend
+        //extrae datos del nombre para enviar al backend
         const cleanName = file.name.replace(/\.(mp3|wav|flac)$/, '');
         const parts = cleanName.split(' - ');
         const title = parts.length === 2 ? parts[1].trim() : cleanName.trim();
         const artist = parts.length === 2 ? parts[0].trim() : 'Unknown Artist';
         const album = 'Unknown Album';
-
-        // Enviar la canción al backend (solo para almacenarla)
+        let songId: number | undefined;
+        //envia la canción al backend (solo para almacenarla)
         try {
-          await this.apiService.createOrGetSong(title, artist, album).toPromise();
+          const response = await this.apiService.createOrGetSong(title, artist, album).toPromise();
+          songId = response.id;
         } catch (error) {
           console.error(`Error enviando ${file.name} al backend:`, error);
         }
 
         return {
-          name: file.name,
+          id: songId,
+          nombre: file.name,
           path,
           duration,
+          title,
+          artist,
+          album
         };
       })
     );
 
     this.songsSearched = [...this.songs];
+    this.apiService.setDirectorySongs(this.songsSearched)
     this.musicService.setWebSongs(this.songs);
   }
 
   openPlayer(song: Song) {
     this.router.navigate(['/music-player'], {
       queryParams: {
-        name: song.name,
+        nombre: song.nombre,
         path: song.path,
         duration: song.duration || 0,
       },
+    });
+  }
+
+
+  async presentActionSheet(song: Song) {
+    await this.loadPlaylists(); // Cargar las listas de reproducción
+
+    const buttons: Array<{ text: string; handler?: () => void; role?: string }> = this.playlists.map((playlist) => ({
+      text: playlist.nombre, // Nombre de la lista como texto del botón
+      handler: () => {
+        console.log(`Seleccionaste la lista: ${playlist.nombre}`);
+        this.apiService.addSongToPlaylist(playlist.id, song.id!).subscribe({
+          next: (updatedPlaylist) => {
+            console.log(`Canción añadida a la lista: ${playlist.nombre}`);
+            console.log('Lista actualizada:', updatedPlaylist);
+          },
+          error: (error) => {
+            console.error(`Error añadiendo la canción a la lista ${playlist.nombre}:`, error);
+          },
+        });
+      },
+    }));
+
+    buttons.push({
+      text: 'Cancelar',
+      role: 'cancel',
+    });
+
+    const actionSheet = await this.actionSheetCtrl.create({
+      header: 'Elige un Álbum:',
+      buttons: buttons, // Usar las listas como botones
+    });
+
+    await actionSheet.present();
+  }
+
+  async loadPlaylists(): Promise<void> {
+    this.ApiService.setUserId(1);
+    return new Promise((resolve, reject) => {
+      this.ApiService.getPlaylists().subscribe({
+        next: (playlists) => {
+          this.playlists = playlists.map(playlist => ({
+            id: playlist.id,
+            nombre: playlist.nombre,
+            imagen: playlist.imagen ? playlist.imagen : 'assets/cover/default-playlist.png',
+            canciones: playlist.canciones,
+          }));
+          resolve(); //resuelve la promise si las listas se cargan bien
+        },
+        error: (error) => {
+          console.error('Error cargando listas:', error);
+          reject(error); //rechaza el promise si hay errores
+        },
+      });
     });
   }
 }

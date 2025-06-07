@@ -45,5 +45,9 @@ export const routes: Routes = [
   {
     path: 'music-player',
     loadComponent: () => import('./music-player/music-player.page').then( m => m.MusicPlayerPage)
+  },
+  {
+    path: 'lista',
+    loadComponent: () => import('./list/list.page').then( m => m.ListPage)
   }
 ];

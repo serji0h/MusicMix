@@ -1,0 +1,53 @@
+.container-song{
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  margin: 10px;
+}
+
+.playable-btn{
+  display: flex;
+  flex-wrap: wrap;
+  width: 75%;
+}
+button{
+
+  height: 50px;
+  width: 50px;
+  border-radius: 500px;
+  z-index: 1;
+  background-color: rgb(47, 111, 206);
+
+}
+.addToPlayilst{
+  justify-content: end;
+}
+button:hover{
+  animation: bright-effect 1s;
+  background-color: rgb(63, 168, 255);
+}
+ion-item{
+  z-index: 0;
+}
+
+ion-label{
+
+  align-content: center;
+  padding :10px;
+
+}
+ion-icon{
+  font-size:50px;
+  color: white;
+}
+
+
+@keyframes bright-effect {
+  from{
+    background-color:rgb(47, 111, 206);
+
+  }
+  to{
+    background-color: rgb(63, 168, 255);
+  }
+}
