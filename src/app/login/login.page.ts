@@ -2,8 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonContent, IonHeader, IonTitle, IonToolbar, IonItem, IonLabel, IonButton, IonInput, IonToast } from '@ionic/angular/standalone';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Router } from '@angular/router';
+import { ApiService } from '../services/api-service.service'; // Ajusta la ruta
+import { MusicService } from '../services/music.service'; // Ajusta la ruta
 
 @Component({
   selector: 'app-login',
@@ -12,43 +14,49 @@ import { Router } from '@angular/router';
   standalone: true,
   imports: [IonToast, IonInput, IonButton, IonLabel, IonItem, IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule]
 })
-
 export class LoginPage implements OnInit {
-  email: string = '' ;
+  email: string = '';
   contrasena: string = '';
-  mensaje = "";
-  constructor(private http:HttpClient, private router:Router) { }
+  mensaje: string = '';
+  private apiUrl = 'https://localhost:8443/api/auth'; // Backend URL
+
+  constructor(
+    private http: HttpClient,
+    private router: Router,
+    private apiService: ApiService,
+    private musicService: MusicService
+  ) {}
 
   ngOnInit() {
-    // para saber si luego puede implementar algo para hacer que compruebe si ya se habia logeado
-  }
-  easyLogin(){
-    this.router.navigate(['/tabs']);
-  }
-  iniciarSesion() {
-    console.log('Iniciando sesión con:', this.email, this.contrasena);
-
-    this.http.get<any[]>("http://localhost:8080/usuarios").subscribe({
-      next: (usuarios) => {
-        const usuario = usuarios.find(
-          u => u.email.trim() === this.email.trim() && u.contrasena.trim() === this.contrasena.trim()
-        );
-
-        if (usuario) {
-          console.log('Usuario encontrado:', usuario);
-          this.mensaje = "Se ha Iniciado Sesión";
-
-          this.router.navigate(['/tabs']);
-        } else {
-          console.error('Usuario no encontrado');
-          this.mensaje = "Usuario no encontrado";
-        }
-      },
-      error: (error) => {
-        //this.mensaje = "Error al iniciar sesión";
-        console.error("Error al obtener al usuario", error);
-      }
-    });
+    // No comprobamos sesiones previas porque no almacenamos userId
   }
 
+  async iniciarSesion() {
+    if (!this.email || !this.contrasena) {
+      this.mensaje = 'Por favor, complete email y contraseña';
+      return;
+    }
+
+    const credentials = {
+      email: this.email.trim(),
+      contrasena: this.contrasena.trim()
+    };
+
+    try {
+      const response = await this.http.post<any>(`${this.apiUrl}/login`, credentials, {
+        headers: new HttpHeaders({
+          'Content-Type': 'application/json'
+        })
+      }).toPromise();
+
+      const userId = response.userId;
+      this.apiService.setUserId(userId); // Pasa el userId a ApiService
+      this.musicService.setUserId(userId); // Pasa el userId a MusicService
+      this.mensaje = 'Inicio de sesión exitoso';
+      this.router.navigate(['/tabs']);
+    } catch (error: any) {
+      console.error('Error al iniciar sesión:', error);
+      this.mensaje = error.error || 'Error al iniciar sesión';
+    }
+  }
 }

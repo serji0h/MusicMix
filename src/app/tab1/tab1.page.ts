@@ -135,7 +135,7 @@ export class Tab1Page {
   }
 
   async loadPlaylists(): Promise<void> {
-    this.ApiService.setUserId(1);
+    this.ApiService.getUserId();
     return new Promise((resolve, reject) => {
       this.ApiService.getPlaylists().subscribe({
         next: (playlists) => {

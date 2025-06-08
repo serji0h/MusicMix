@@ -55,6 +55,9 @@ export class ApiService {
     this.userId = userId;
   }
 
+  getUserId(): number | null {
+    return this.userId;
+  }
 
 // Obtener listas de reproducción
 getPlaylists(): Observable<Playlist[]> {

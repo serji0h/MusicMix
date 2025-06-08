@@ -36,6 +36,7 @@
     "@capacitor/keyboard": "7.0.1",
     "@capacitor/status-bar": "7.0.1",
     "@ionic/angular": "^8.0.0",
+    "@ionic/storage-angular": "^4.0.0",
     "@mediagrid/capacitor-native-audio": "^2.1.0",
     "capacitor-music-controls-plugin": "^6.1.0",
     "cordova-plugin-background-fetch": "^7.2.4",

@@ -4,12 +4,6 @@ import { Directory, Filesystem } from '@capacitor/filesystem';
 import { NativeAudio } from '@capacitor-community/native-audio';
 import { ApiService, Song, Playlist } from './api-service.service';
 
-// export interface Song {
-//   name: string;
-//   path: string;
-//   duration?: number;
-// }
-
 @Injectable({
   providedIn: 'root',
 })
@@ -20,6 +14,12 @@ export class MusicService {
 
   constructor(private apiService: ApiService) {}
 
+  // Nuevo método para recibir el userId desde LoginPage
+  setUserId(userId: number) {
+    this.userId = userId;
+    this.apiService.setUserId(userId); // Pasa el userId a ApiService
+  }
+
   async listSongs(): Promise<Song[]> {
     if (Capacitor.isNativePlatform()) {
       return this.getMusicFiles();
@@ -29,6 +29,9 @@ export class MusicService {
   }
 
   async getMusicFiles(): Promise<Song[]> {
+    if (!this.userId) {
+      console.warn('Usuario no autenticado, algunas funciones pueden no estar disponibles');
+    }
     try {
       const result = await Filesystem.readdir({
         directory: Directory.ExternalStorage,
@@ -60,24 +63,24 @@ export class MusicService {
                 await NativeAudio.unload({ assetId }).catch(() => {});
               } catch (e) {
                 console.error(`Error obteniendo duración para ${file.name}:`, e);
-                duration = 0; //si falla se pone a 0
+                duration = 0; // si falla se pone a 0
               }
             }
-            //extrae datos del nombre
+            // extrae datos del nombre
             const { title, artist } = this.extractMetadataFromName(file.name);
-            //como no se puede obtener el album, se pone un valor por defecto
+            // como no se puede obtener el album, se pone un valor por defecto
             const album = 'Unknown Album';
             let songId: number | undefined;
 
             try {
               const response = await this.apiService.createOrGetSong(title, artist, album).toPromise();
-              songId = response.id; //asigna el id de la cancion
+              songId = response.id; // asigna el id de la cancion
             } catch (error) {
               console.error(`el titulo es este ${title} con artista ${artist}`);
-              console.error(`Error enviando ${file.name} al backend:`,error);
+              console.error(`Error enviando ${file.name} al backend:`, error);
             }
             return {
-              id: songId, //no necesitamos el id para listado
+              id: songId, // no necesitamos el id para listado
               nombre: file.name,
               path: fileUri,
               duration,
@@ -85,7 +88,6 @@ export class MusicService {
               artist,
               album,
             };
-
           })
       );
 
@@ -116,6 +118,4 @@ export class MusicService {
       };
     }
   }
-
-
 }

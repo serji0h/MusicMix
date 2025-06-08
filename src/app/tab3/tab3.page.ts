@@ -1,47 +1,65 @@
 import { Component, OnInit } from '@angular/core';
 import { MusicService } from '../services/music.service';
-import { AlertController, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonList, IonItem, IonLabel, IonButton, IonIcon, IonHeader, IonToolbar, IonTitle, IonContent } from '@ionic/angular/standalone';
+import { AlertController, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonList, IonItem, IonLabel, IonButton, IonIcon, IonHeader, IonToolbar, IonTitle, IonContent, IonToast } from '@ionic/angular/standalone';
 import { CommonModule } from '@angular/common';
 import { addIcons } from 'ionicons';
-import { add, navigate, play } from 'ionicons/icons';
+import { add } from 'ionicons/icons';
 import { ApiService, Song, Playlist } from '../services/api-service.service';
 import { Router } from '@angular/router';
+
 @Component({
   selector: 'app-tab3',
   templateUrl: './tab3.page.html',
   styleUrls: ['./tab3.page.scss'],
   standalone: true,
-  imports: [CommonModule, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonList, IonItem, IonLabel, IonButton, IonIcon, IonHeader, IonToolbar, IonTitle, IonContent],
+  imports: [CommonModule, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonList, IonItem, IonLabel, IonButton, IonIcon, IonHeader, IonToolbar, IonTitle, IonContent, IonToast]
 })
 export class Tab3Page implements OnInit {
   playlists: Playlist[] = [];
   selectedPlaylist: Playlist | null = null;
   songs: Song[] = [];
   showAddSongs = false;
+  mensaje: string = '';
 
-  constructor(private musicService: MusicService, private alertController: AlertController, private ApiService: ApiService, private router : Router) {
+  constructor(
+    private musicService: MusicService,
+    private alertController: AlertController,
+    private apiService: ApiService,
+    private router: Router
+  ) {
     addIcons({ add });
   }
 
   ngOnInit() {
-    this.ApiService.setUserId(1); // Cambia por el ID del usuario autenticado
-    this.loadPlaylists();
-    this.loadSongs();
+    // No seteamos userId hardcoded
+    this.checkUserAndLoadPlaylists();
   }
 
-  loadPlaylists() {
-    this.ApiService.getPlaylists().subscribe({
+  private checkUserAndLoadPlaylists() {
+    // Verifica si hay un userId en ApiService
+    try {
+      this.loadPlaylists();
+    } catch (error) {
+      console.error('Usuario no autenticado:', error);
+      this.mensaje = 'Por favor, inicia sesión';
+      this.router.navigate(['/login']);
+    }
+  }
+
+  private loadPlaylists() {
+    this.apiService.getPlaylists().subscribe({
       next: (playlists) => {
-        this.playlists = playlists.map(playlist => {
-          return {
-            id: playlist.id,
-            nombre: playlist.nombre,
-            imagen: playlist.imagen ? playlist.imagen : 'assets/cover/default-playlist.png', // Imagen por defecto
-            canciones: playlist.canciones, // Si tiene canciones asociadas
-          };
-        });
+        this.playlists = playlists.map(playlist => ({
+          id: playlist.id,
+          nombre: playlist.nombre,
+          imagen: playlist.imagen ? playlist.imagen : 'assets/cover/default-playlist.png',
+          canciones: playlist.canciones || []
+        }));
       },
-      error: (error) => console.error('Error cargando listas:', error),
+      error: (error) => {
+        console.error('Error cargando listas:', error);
+        this.mensaje = 'Error al cargar las listas';
+      }
     });
   }
 
@@ -56,49 +74,46 @@ export class Tab3Page implements OnInit {
         {
           name: 'nombre',
           type: 'text',
-          placeholder: 'Nombre de la lista',
-        },
-        {
-          name: 'imagen',
-          // type: 'file',
-          // attributes: {
-          //   accept: 'image/*',
-          // },
-        },
+          placeholder: 'Nombre de la lista'
+        }
       ],
       buttons: [
         {
-          text: 'Cancelar',
-          role: 'cancel',
+          text: 'Cancel',
+          role: 'cancel'
         },
         {
           text: 'Crear',
           handler: async (data) => {
             if (!data.nombre) {
+              this.mensaje = 'El nombre es obligatorio';
               return false;
             }
-            // const input = document.querySelector('input[name="imagen"]') as HTMLInputElement;
-            // const imagen = input.files?.[0];
-            // let imagenPath: string | undefined;
-
-            // if (imagen) {
-            //   // imagenPath = await this.ApiService.savePlaylistImage(imagen);
-            // }
-
-            this.ApiService.createPlaylist(data.nombre).subscribe({
-              next: (playlist) => {
-                this.playlists.push({
-                  ...playlist,
-                  imagen: 'assets/cover/default-playlist.png', //|| imagenPath
-                  canciones: [],
-                });
-              },
-              error: (error) => console.error('Error creando lista:', error),
-            });
-            return true;
-          },
-        },
-      ],
+            try {
+              this.apiService.createPlaylist(data.nombre).subscribe({
+                next: (playlist) => {
+                  this.playlists.push({
+                    ...playlist,
+                    imagen: 'assets/cover/default-playlist.jpg',
+                    canciones: []
+                  });
+                  this.mensaje = 'Lista creada exitosamente';
+                },
+                error: (error) => {
+                  console.error('Error creando lista:', error);
+                  this.mensaje = 'Error al crear la lista';
+                }
+              });
+              return true;
+            } catch (error) {
+              console.error('Usuario no autenticado:', error);
+              this.mensaje = 'Por favor, inicia sesión';
+              this.router.navigate(['/login']);
+              return false;
+            }
+          }
+        }
+      ]
     });
     await alert.present();
   }
@@ -106,29 +121,32 @@ export class Tab3Page implements OnInit {
   selectPlaylist(playlist: Playlist) {
     this.selectedPlaylist = playlist;
     this.showAddSongs = false;
-    //va a la pagina lista y le pasa los parametros de la playlist seleccionada
-    this.router.navigate(["/lista"], {queryParams:{
-      id: playlist.id,
-      nombre: playlist.nombre,
-      canciones: playlist.canciones,
-      imagen: playlist.imagen
-    }
-
-    })
-
+    this.router.navigate(['/lista'], {
+      queryParams: {
+        id: playlist.id,
+        nombre: playlist.nombre,
+        canciones: JSON.stringify(playlist.canciones),
+        imagen: playlist.imagen
+      }
+    });
   }
 
   addSongToPlaylist(song: Song) {
     if (!this.selectedPlaylist || !song.id) {
-      console.error('No se ha seleccionado una lista o la canción no tiene ID');
+      console.error('No se ha seleccionado playlist o la canción no tiene ID');
+      this.mensaje = 'Error: Selecciona una lista y una canción válida';
       return;
     }
-    this.ApiService.addSongToPlaylist(this.selectedPlaylist.id, song.id).subscribe({
+    this.apiService.addSongToPlaylist(this.selectedPlaylist.id, song.id).subscribe({
       next: (playlist) => {
         this.selectedPlaylist!.canciones.push(song);
         this.showAddSongs = false;
+        this.mensaje = 'Canción añadida a la lista';
       },
-      error: (error) => console.error('Error añadiendo canción:', error),
+      error: (error) => {
+        console.error('Error añadiendo canción:', error);
+        this.mensaje = 'Error al añadir la canción';
+      }
     });
   }
 }
