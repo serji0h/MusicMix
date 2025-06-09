@@ -1,0 +1,45 @@
+.player-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  padding: 20px;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.cover-image {
+  width: 250px;
+  height: 250px;
+  border-radius: 20px;
+  object-fit: cover;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+ion-range {
+  width: 100%;
+  max-width: 350px;
+}
+
+.time-info {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 350px;
+  font-size: 14px;
+  color: #505194;
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 25px;
+  margin-top: 10px;
+}
+
+h2 {
+  font-size: 24px;
+  color: #fafaff;
+  text-align: center;
+}

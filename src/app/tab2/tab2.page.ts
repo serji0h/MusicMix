@@ -52,7 +52,7 @@ export class Tab2Page implements OnInit {
         console.error('Error al recibir token:', token);
       }
 
-      // Limpiar la URL
+      //limpia la url
       const newUrl = window.location.origin + window.location.pathname;
       window.history.replaceState({}, '', newUrl);
     }

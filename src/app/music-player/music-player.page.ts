@@ -29,7 +29,7 @@ export class MusicPlayerPage implements OnInit, OnDestroy {
 
   async ngOnInit() {
     this.route.queryParams.subscribe(async params => {
-      this.songName = params['name'];
+      this.songName = params['nombre'];
       this.songPath = params['path'];
       this.duration = parseFloat(params['duration']) || 0;
       console.log('Duration from params:', this.duration);
@@ -38,7 +38,7 @@ export class MusicPlayerPage implements OnInit, OnDestroy {
       this.player.setDuration(this.duration);
       this.duration = await this.player.getDuration();
       if (this.duration === 0) {
-        this.duration = 300; // Valor por defecto
+        this.duration = 300; //valor por defecto
         this.player.setDuration(this.duration);
       }
       console.log('Duration from service:', this.duration);
@@ -91,5 +91,22 @@ export class MusicPlayerPage implements OnInit, OnDestroy {
     const min = Math.floor(seconds / 60);
     const sec = Math.floor(seconds % 60);
     return `${min}:${sec < 10 ? '0' + sec : sec}`;
+  }
+
+  private extractMetadataFromName(fileName: string): { title: string, artist: string } {
+    const cleanName = fileName.replace(/\.(mp3|wav|flac)$/, ''); //eliminar la extensi0n del archivo
+    const parts = cleanName.split(' - '); //divide por " - "
+
+    if (parts.length === 2) {
+      return {
+        artist: parts[0].trim(), //parte como artista
+        title: parts[1].trim(),  //parte como título
+      };
+    } else {
+      return {
+        artist: 'Unknown Artist', //artista desconocido si no hay formato esperado
+        title: cleanName.trim(),  //usar el nombre limpio como título
+      };
+    }
   }
 }

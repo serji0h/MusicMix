@@ -5,30 +5,27 @@
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <!-- Botón para crear lista -->
-  <ion-button expand="block" (click)="createPlaylist()">
-    <ion-icon name="add" slot="start"></ion-icon>
-    Crear Nueva Lista
-  </ion-button>
+  <div class="create-button-wrapper">
+    <ion-button expand="block" (click)="createPlaylist()">
+      <ion-icon name="add" slot="start"></ion-icon>
+      Crear Nueva Lista
+    </ion-button>
+  </div>
 
-
-  <div class="playlists-container">
-  <!-- Lista de reproducción como tarjetas -->
-   <div class ="playlists-grid" *ngFor="let playlist of playlists">
-    <ion-card  (click)="selectPlaylist(playlist)">
+  <div class="playlists-grid">
+    <ion-card *ngFor="let playlist of playlists" (click)="selectPlaylist(playlist)" class="playlist-card">
+      <img
+        [src]="playlist.imagen || 'assets/cover/default-playlist.png'"
+        alt="Playlist Cover"
+      />
       <ion-card-header>
         <ion-card-title>{{ playlist.nombre }}</ion-card-title>
       </ion-card-header>
-      <ion-card-content>
-        <img [src]="playlist.imagen" alt="Playlist Cover" style="width: 100px; height: 100px;" />
-      </ion-card-content>
     </ion-card>
-   </div>
-
   </div>
 
-  <!-- Vista para añadir canciones -->
-  <ion-list *ngIf="showAddSongs">
+  <!-- Lista de canciones (modo añadir) -->
+  <ion-list *ngIf="showAddSongs" class="add-songs-list">
     <ion-item *ngFor="let song of songs">
       <ion-label>{{ song.nombre }}</ion-label>
       <ion-button slot="end" (click)="addSongToPlaylist(song)">

@@ -9,7 +9,7 @@
 <ion-content [fullscreen]="true">
   <ion-searchbar (ionInput)="searchSongs($event)"></ion-searchbar>
 
-  <!--IF IS WEB-->
+  <!--is es web-->
   <div *ngIf="!isMobile">
     <input type="file" (change)="directorySelected($event)" webkitdirectory directory multiple />
   </div>

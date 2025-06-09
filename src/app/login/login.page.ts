@@ -18,7 +18,7 @@ export class LoginPage implements OnInit {
   email: string = '';
   contrasena: string = '';
   mensaje: string = '';
-  private apiUrl = 'https://localhost:8443/api/auth'; // Backend URL
+  private apiUrl = 'https://localhost:8443/api/auth';
 
   constructor(
     private http: HttpClient,
@@ -28,7 +28,6 @@ export class LoginPage implements OnInit {
   ) {}
 
   ngOnInit() {
-    // No comprobamos sesiones previas porque no almacenamos userId
   }
 
   async iniciarSesion() {
@@ -50,8 +49,9 @@ export class LoginPage implements OnInit {
       }).toPromise();
 
       const userId = response.userId;
-      this.apiService.setUserId(userId); // Pasa el userId a ApiService
-      this.musicService.setUserId(userId); // Pasa el userId a MusicService
+      //pasa el id a los services que lo usan
+      this.apiService.setUserId(userId);
+      this.musicService.setUserId(userId);
 
       this.router.navigate(['/tabs']);
     } catch (error: any) {

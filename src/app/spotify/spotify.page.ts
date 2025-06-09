@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonContent, IonHeader, IonTitle, IonToolbar, IonSearchbar, SearchbarInputEventDetail, IonButton, IonIcon, IonInput, IonList, IonCard, IonCardHeader, IonCardTitle, IonCardSubtitle, IonCardContent } from '@ionic/angular/standalone';
+import { IonContent, IonHeader, IonTitle, IonToolbar, IonSearchbar, SearchbarInputEventDetail, IonButton, IonIcon, IonInput, IonList, IonCard, IonCardHeader, IonCardTitle, IonCardSubtitle, IonCardContent, IonButtons, IonBackButton } from '@ionic/angular/standalone';
 import { IonSearchbarCustomEvent } from '@ionic/core';
 import { addIcons } from 'ionicons';
 import { searchOutline } from 'ionicons/icons';
@@ -11,7 +11,7 @@ import { searchOutline } from 'ionicons/icons';
   templateUrl: './spotify.page.html',
   styleUrls: ['./spotify.page.scss'],
   standalone: true,
-  imports: [IonCardContent, IonCardSubtitle, IonCardTitle, IonCardHeader, IonCard, IonList, IonIcon, IonButton,IonInput, IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule]
+  imports: [IonBackButton, IonButtons, IonCardContent, IonCardTitle, IonCardHeader, IonCard, IonIcon, IonButton,IonInput, IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule]
 })
 export class SpotifyPage implements OnInit {
   currentPreviewUrl: string | null = null;

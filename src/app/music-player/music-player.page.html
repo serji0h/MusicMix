@@ -10,7 +10,7 @@
 <ion-content class="ion-padding">
   <div class="player-container">
     <img src="assets/cover/image.png" alt="cover" class="cover-image" />
-
+    <h2 class="song-title">{{ songName }}</h2>
     <ion-range
       min="0"
       [max]="duration"
@@ -28,8 +28,8 @@
         <ion-icon name="play-skip-back-outline"></ion-icon>
       </ion-button>
 
-      <ion-button fill="clear" (click)="togglePlay()">
-        <ion-icon [name]="isPlaying ? 'pause-outline' : 'play-outline'"></ion-icon>
+      <ion-button fill="solid" color="primary" shape="round" size="large" (click)="togglePlay()">
+        <ion-icon slot="icon-only" [name]="isPlaying ? 'pause-outline' : 'play-outline'"></ion-icon>
       </ion-button>
 
       <ion-button fill="clear" (click)="skipForward()">

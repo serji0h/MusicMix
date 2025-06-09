@@ -31,12 +31,11 @@ export class Tab3Page implements OnInit {
   }
 
   ngOnInit() {
-    // No seteamos userId hardcoded
+
     this.checkUserAndLoadPlaylists();
   }
 
   private checkUserAndLoadPlaylists() {
-    // Verifica si hay un userId en ApiService
     try {
       this.loadPlaylists();
     } catch (error) {
@@ -125,7 +124,7 @@ export class Tab3Page implements OnInit {
       queryParams: {
         id: playlist.id,
         nombre: playlist.nombre,
-      //  no le paso canciones porque luego las recojo en /lista
+      //no le paso canciones porque luego las recojo en /lista
         imagen: playlist.imagen
       }
     });

@@ -28,7 +28,8 @@ export class Tab1Page {
 
   async ngOnInit() {
     this.songs = await this.musicService.listSongs();
-    this.songsSearched = [...this.songs];
+    //copia las canciones obtenidas a la lista de canciones buscadas
+    this.songsSearched = this.songs;
   }
 
   searchSongs(event: any) {
@@ -86,8 +87,8 @@ export class Tab1Page {
       })
     );
 
-    this.songsSearched = [...this.songs];
-    this.apiService.setDirectorySongs(this.songsSearched)
+    this.songsSearched = this.songs;
+    this.apiService.setDirectorySongs(this.songsSearched);
     this.musicService.setWebSongs(this.songs);
   }
 
@@ -103,10 +104,10 @@ export class Tab1Page {
 
 
   async presentActionSheet(song: Song) {
-    await this.loadPlaylists(); // Cargar las listas de reproducción
+    await this.loadPlaylists(); // carga las listas de reproduccion
 
     const buttons: Array<{ text: string; handler?: () => void; role?: string }> = this.playlists.map((playlist) => ({
-      text: playlist.nombre, // Nombre de la lista como texto del botón
+      text: playlist.nombre, //nombre de la lista como texto del botón
       handler: () => {
         console.log(`Seleccionaste la lista: ${playlist.nombre}`);
         this.apiService.addSongToPlaylist(playlist.id, song.id!).subscribe({
@@ -128,7 +129,7 @@ export class Tab1Page {
 
     const actionSheet = await this.actionSheetCtrl.create({
       header: 'Elige un Álbum:',
-      buttons: buttons, // Usar las listas como botones
+      buttons: buttons, //usa las listas como botones
     });
 
     await actionSheet.present();
