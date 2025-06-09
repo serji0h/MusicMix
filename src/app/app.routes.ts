@@ -49,5 +49,9 @@ export const routes: Routes = [
   {
     path: 'lista',
     loadComponent: () => import('./list/list.page').then( m => m.ListPage)
+  },
+  {
+    path: 'spotify',
+    loadComponent: () => import('./spotify/spotify.page').then( m => m.SpotifyPage)
   }
 ];

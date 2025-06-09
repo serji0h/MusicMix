@@ -36,7 +36,7 @@ export class LoginPage implements OnInit {
       this.mensaje = 'Por favor, complete email y contraseña';
       return;
     }
-
+    this.mensaje = 'Inicio de sesión exitoso';
     const credentials = {
       email: this.email.trim(),
       contrasena: this.contrasena.trim()
@@ -52,7 +52,7 @@ export class LoginPage implements OnInit {
       const userId = response.userId;
       this.apiService.setUserId(userId); // Pasa el userId a ApiService
       this.musicService.setUserId(userId); // Pasa el userId a MusicService
-      this.mensaje = 'Inicio de sesión exitoso';
+
       this.router.navigate(['/tabs']);
     } catch (error: any) {
       console.error('Error al iniciar sesión:', error);

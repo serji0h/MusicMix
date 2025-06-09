@@ -1,0 +1,38 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Spotify</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">spotify</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <div style="display: flex; align-items: center; justify-content: center; gap: 10px; padding: 16px;">
+    <ion-input
+      type="text"
+      [(ngModel)]="query"
+      placeholder="Buscar canciones"
+      name="query"
+    ></ion-input>
+
+    <ion-button (click)="searchTracks()">
+      <ion-icon name="search-outline"></ion-icon>
+    </ion-button>
+  </div>
+
+  <div class="tracks-container" *ngIf="tracks.length > 0">
+    <ion-card *ngFor="let track of tracks" (click)="playPreview(track)">
+      <img [src]="track.album.images[0]?.url" alt="Cover"/>
+      <ion-card-header>
+        <ion-card-title>{{ track.name }}</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        Álbum: {{ track.album.name }}
+      </ion-card-content>
+    </ion-card>
+  </div>
+</ion-content>

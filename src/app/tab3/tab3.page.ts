@@ -12,7 +12,7 @@ import { Router } from '@angular/router';
   templateUrl: './tab3.page.html',
   styleUrls: ['./tab3.page.scss'],
   standalone: true,
-  imports: [CommonModule, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonList, IonItem, IonLabel, IonButton, IonIcon, IonHeader, IonToolbar, IonTitle, IonContent, IonToast]
+  imports: [CommonModule, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonList, IonItem, IonLabel, IonButton, IonIcon, IonHeader, IonToolbar, IonTitle, IonContent]
 })
 export class Tab3Page implements OnInit {
   playlists: Playlist[] = [];
@@ -125,7 +125,7 @@ export class Tab3Page implements OnInit {
       queryParams: {
         id: playlist.id,
         nombre: playlist.nombre,
-        canciones: JSON.stringify(playlist.canciones),
+      //  no le paso canciones porque luego las recojo en /lista
         imagen: playlist.imagen
       }
     });
@@ -138,6 +138,7 @@ export class Tab3Page implements OnInit {
       return;
     }
     this.apiService.addSongToPlaylist(this.selectedPlaylist.id, song.id).subscribe({
+
       next: (playlist) => {
         this.selectedPlaylist!.canciones.push(song);
         this.showAddSongs = false;
