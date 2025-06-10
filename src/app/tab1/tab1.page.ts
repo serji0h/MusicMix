@@ -104,7 +104,7 @@ export class Tab1Page {
 
 
   async presentActionSheet(song: Song) {
-    await this.loadPlaylists(); // carga las listas de reproduccion
+    await this.loadPlaylists(); //se espera a cargar las listas de reproduccion para luego mostrar lo siguente
 
     const buttons: Array<{ text: string; handler?: () => void; role?: string }> = this.playlists.map((playlist) => ({
       text: playlist.nombre, //nombre de la lista como texto del botón

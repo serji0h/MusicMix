@@ -22,13 +22,13 @@
       name="query"
     ></ion-input>
 
-    <ion-button (click)="searchTracks()">
+    <button (click)="searchTracks()">
       <ion-icon name="search-outline"></ion-icon>
-    </ion-button>
+    </button>
   </div>
 
   <div class="tracks-container" *ngIf="tracks.length > 0">
-    <ion-card *ngFor="let track of tracks" (click)="playPreview(track)">
+    <ion-card *ngFor="let track of tracks" (click)="playTrack(track)">
       <img [src]="track.album.images[0]?.url" alt="Cover"/>
       <ion-card-header>
         <ion-card-title>{{ track.name }}</ion-card-title>

@@ -1,36 +1,34 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>
-      Canciones
-    </ion-title>
+    <ion-title>Canciones</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <ion-searchbar (ionInput)="searchSongs($event)"></ion-searchbar>
+  <ion-searchbar placeholder="Buscar canciones" (ionInput)="searchSongs($event)"></ion-searchbar>
 
-  <!--is es web-->
-  <div *ngIf="!isMobile">
+  <!-- Input para seleccionar directorio en web -->
+  <div *ngIf="!isMobile" class="file-input">
     <input type="file" (change)="directorySelected($event)" webkitdirectory directory multiple />
   </div>
 
   <ion-list>
-    <ion-item *ngFor="let song of songsSearched" >
+    <ion-item *ngFor="let song of songsSearched" lines="none">
       <div class="container-song">
-        <div (click)="openPlayer(song)" class="playable-btn">
-          <ion-thumbnail slot="start">
-            <img src="assets/cover/image.png" alt="Song Cover"/>
+        <div class="playable-btn" (click)="openPlayer(song)">
+          <ion-thumbnail>
+            <img src="assets/cover/image.png" alt="Song Cover" />
           </ion-thumbnail>
           <ion-label>
-            <h6>{{song.nombre}}</h6>
+            <h6>{{ song.title || song.nombre }}</h6>
           </ion-label>
         </div>
-        <!-- cuidad, que no se repitan las canciones -->
-        <div class="addToPlayilst">
-          <button (click)="presentActionSheet(song)"><ion-icon name="add-circle-outline"></ion-icon></button>
+        <div class="add-to-playlist">
+          <button (click)="presentActionSheet(song); $event.stopPropagation()">
+            <ion-icon name="add-circle-outline"></ion-icon>
+          </button>
         </div>
       </div>
-      </ion-item>
-
+    </ion-item>
   </ion-list>
 </ion-content>

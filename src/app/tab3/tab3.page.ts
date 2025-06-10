@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { MusicService } from '../services/music.service';
-import { AlertController, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonList, IonItem, IonLabel, IonButton, IonIcon, IonHeader, IonToolbar, IonTitle, IonContent, IonToast } from '@ionic/angular/standalone';
+import { AlertController, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonList, IonItem, IonLabel, IonButton, IonIcon, IonHeader, IonToolbar, IonTitle, IonContent, IonToast, IonFooter } from '@ionic/angular/standalone';
 import { CommonModule } from '@angular/common';
 import { addIcons } from 'ionicons';
 import { add } from 'ionicons/icons';
@@ -12,12 +12,11 @@ import { Router } from '@angular/router';
   templateUrl: './tab3.page.html',
   styleUrls: ['./tab3.page.scss'],
   standalone: true,
-  imports: [CommonModule, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonList, IonItem, IonLabel, IonButton, IonIcon, IonHeader, IonToolbar, IonTitle, IonContent]
+  imports: [CommonModule, IonCard, IonCardHeader, IonCardTitle, IonButton, IonIcon, IonHeader, IonToolbar, IonTitle, IonContent]
 })
 export class Tab3Page implements OnInit {
   playlists: Playlist[] = [];
   selectedPlaylist: Playlist | null = null;
-  songs: Song[] = [];
   showAddSongs = false;
   mensaje: string = '';
 
@@ -62,9 +61,7 @@ export class Tab3Page implements OnInit {
     });
   }
 
-  async loadSongs() {
-    this.songs = await this.musicService.listSongs();
-  }
+
 
   async createPlaylist() {
     const alert = await this.alertController.create({
@@ -92,11 +89,11 @@ export class Tab3Page implements OnInit {
               this.apiService.createPlaylist(data.nombre).subscribe({
                 next: (playlist) => {
                   this.playlists.push({
-                    ...playlist,
-                    imagen: 'assets/cover/default-playlist.jpg',
+                    ...playlist,//copia el resto de propiedades del objeto playlist
+                    imagen: 'assets/cover/default-playlist.png',
                     canciones: []
                   });
-                  this.mensaje = 'Lista creada exitosamente';
+                  this.mensaje = 'Lista creada';
                 },
                 error: (error) => {
                   console.error('Error creando lista:', error);
@@ -105,9 +102,7 @@ export class Tab3Page implements OnInit {
               });
               return true;
             } catch (error) {
-              console.error('Usuario no autenticado:', error);
-              this.mensaje = 'Por favor, inicia sesión';
-              this.router.navigate(['/login']);
+              console.error('Ha ocurrido un error:', error);
               return false;
             }
           }
@@ -130,23 +125,4 @@ export class Tab3Page implements OnInit {
     });
   }
 
-  addSongToPlaylist(song: Song) {
-    if (!this.selectedPlaylist || !song.id) {
-      console.error('No se ha seleccionado playlist o la canción no tiene ID');
-      this.mensaje = 'Error: Selecciona una lista y una canción válida';
-      return;
-    }
-    this.apiService.addSongToPlaylist(this.selectedPlaylist.id, song.id).subscribe({
-
-      next: (playlist) => {
-        this.selectedPlaylist!.canciones.push(song);
-        this.showAddSongs = false;
-        this.mensaje = 'Canción añadida a la lista';
-      },
-      error: (error) => {
-        console.error('Error añadiendo canción:', error);
-        this.mensaje = 'Error al añadir la canción';
-      }
-    });
-  }
 }

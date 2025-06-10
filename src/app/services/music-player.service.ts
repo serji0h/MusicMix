@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Capacitor } from '@capacitor/core';
 import { NativeAudio } from '@capacitor-community/native-audio';
 import {BackgroundMode} from '@awesome-cordova-plugins/background-mode/ngx';
-declare let cordova: any; // Declarar cordova para usar el plugin
+declare let cordova: any; //declara cordova para usar el plugin
 
 @Injectable({
   providedIn: 'root',
@@ -20,8 +20,8 @@ export class MusicPlayerService {
     this.startTime = Date.now() / 1000 - seekToSeconds;
     this.isPaused = false;
 
-    // Activar el modo en segundo plano
-    if (Capacitor.getPlatform() === 'android' || Capacitor.getPlatform() === 'ios') {
+    // deberia de activar el modo segundo plano
+    if (Capacitor.getPlatform() === 'android') {
       console.log('Activando modo en segundo plano...');
       if (cordova && cordova.plugins && cordova.plugins.backgroundMode) {
         cordova.plugins.backgroundMode.enable();
@@ -32,11 +32,10 @@ export class MusicPlayerService {
       } else {
         console.error('El plugin backgroundMode no está disponible.');
       }
-      console.log('estoy justo despues.');
+
     }
 
     if (Capacitor.getPlatform() === 'web') {
-      this.webAudio?.pause();
       this.webAudio = new Audio(path);
       this.webAudio.currentTime = seekToSeconds;
       await this.webAudio.play();
@@ -48,7 +47,7 @@ export class MusicPlayerService {
         await NativeAudio.unload({ assetId: this.currentAssetId }).catch(() => {});
         await NativeAudio.preload({
           assetId: this.currentAssetId,
-          assetPath: encodeURI(path),
+          assetPath: encodeURI(path),//para que no se rompa el formato con los espaciados
           isUrl: true,
           audioChannelNum: 1,
         });
@@ -83,7 +82,7 @@ export class MusicPlayerService {
 
   async stop() {
     if (Capacitor.getPlatform() === 'android' || Capacitor.getPlatform() === 'ios') {
-      cordova.plugins.backgroundMode.disable();
+      //cordova.plugins.backgroundMode.disable();
     }
 
     if (Capacitor.getPlatform() === 'web') {
@@ -103,6 +102,7 @@ export class MusicPlayerService {
       this.webAudio.currentTime = seconds;
     } else {
       try {
+        //no funiona bien en android porqeu no tiene nativo
         await NativeAudio.stop({ assetId: this.currentAssetId }).catch(() => {});
         await NativeAudio.unload({ assetId: this.currentAssetId }).catch(() => {});
         if (this.currentPath) {

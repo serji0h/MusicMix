@@ -29,14 +29,15 @@ export class ApiService {
     this.songsSearched= songsSearched;
 
   }
-  private apiUrl = 'https://192.168.18.55:8443/api/playlists';
-  private apiUrlWeb = 'https://localhost:8443/api/playlists'
+  private apiUrl = 'https://musicmixback.onrender.com/api/playlists';
+  private apiUrlWeb = 'https://musicmixback.onrender.com/api/playlists'
   private userId: number | null = null;
   public songsSearched: Song[] = [];
   constructor(private http: HttpClient){}
 
+  //solo crea la cancion
   createOrGetSong(title: string, artist: string, album: string): Observable<any> {
-    //comprobar si es web o movil
+    //comprueba si es web o movil
     if(Capacitor.getPlatform() == 'web') {
       return this.http.post<any>(`${this.apiUrlWeb}/songs`, { titulo: title, artista: artist, album: album });
     }else{
@@ -59,7 +60,7 @@ export class ApiService {
     return this.userId;
   }
 
-// Obtener listas de reproducción
+// obtiene listas de reproduccion
 getPlaylists(): Observable<Playlist[]> {
   if (!this.userId) {
     throw new Error('Usuario no autenticado');
@@ -72,7 +73,7 @@ getPlaylists(): Observable<Playlist[]> {
   }
 }
 
-// Crear lista de reproducción
+//crea lista de reproduccion
 createPlaylist(nombre: string): Observable<Playlist> {
   if (!this.userId) {
     throw new Error('Usuario no autenticado');
@@ -80,18 +81,23 @@ createPlaylist(nombre: string): Observable<Playlist> {
   return this.http.post<Playlist>(`${this.apiUrl}/user/${this.userId}`, nombre);
 }
 
-// Añadir canción a lista
+//añade canciones a la lista
 addSongToPlaylist(playlistId: number | undefined, songId: number): Observable<Playlist> {
   return this.http.post<Playlist>(`${this.apiUrl}/${playlistId}/add-song/${songId}`, {});
 }
 
+//obtiene las canciones de una play list
 getSongsFromPlaylist(playlistId: number): Observable<Song[]> {
   return this.http.get<Song[]>(`${this.apiUrl}/${playlistId}/songs`);
 
   }
-
+//otiene una cancion por el id
   getSongById(songId: number): Observable<Song> {
     return this.http.get<Song>(`${this.apiUrl}/songs/${songId}`);
+  }
+
+  removeSongFromPlaylist(playlistId: number, songId: number): Observable<Playlist> {
+    return this.http.delete<Playlist>(`${this.apiUrl}/${playlistId}/remove-song/${songId}`);
   }
 
 }

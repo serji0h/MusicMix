@@ -24,13 +24,5 @@
     </ion-card>
   </div>
 
-  <!-- Lista de canciones (modo añadir) -->
-  <ion-list *ngIf="showAddSongs" class="add-songs-list">
-    <ion-item *ngFor="let song of songs">
-      <ion-label>{{ song.nombre }}</ion-label>
-      <ion-button slot="end" (click)="addSongToPlaylist(song)">
-        <ion-icon name="add"></ion-icon>
-      </ion-button>
-    </ion-item>
-  </ion-list>
+
 </ion-content>

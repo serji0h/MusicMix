@@ -1,22 +1,25 @@
 import { MusicService } from './../services/music.service';
-import { navigate } from 'ionicons/icons';
+import { trashOutline } from 'ionicons/icons';
 import { ApiService,Song, Playlist } from './../services/api-service.service';
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonContent, IonHeader, IonTitle, IonToolbar, IonButton, IonIcon, IonList, IonLabel, IonItem, IonButtons, IonBackButton } from '@ionic/angular/standalone';
+import { IonContent, IonHeader, IonTitle, IonToolbar, IonButton, IonIcon, IonList, IonLabel, IonItem, IonButtons, IonBackButton, IonToast, IonFooter } from '@ionic/angular/standalone';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import{ addIcons } from 'ionicons';
+import { Capacitor } from '@capacitor/core';
+addIcons({ trashOutline });
 @Component({
   selector: 'app-list',
   templateUrl: './list.page.html',
   styleUrls: ['./list.page.scss'],
   standalone: true,
-  imports: [IonBackButton, IonButtons, IonItem, IonLabel, IonList, IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule, RouterLink]
+  imports: [IonBackButton, IonButton,IonButtons,IonIcon, IonItem, IonLabel, IonList, IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule, RouterLink]
 })
 export class ListPage implements OnInit {
   id : number = 0;
   nombre : string = "";
-
+  mensaje: string = '';
   songs: Song[] = [];
   constructor(private route : ActivatedRoute, private navegateRouter: Router, private apiService : ApiService, private musicService : MusicService) { }
 
@@ -40,6 +43,20 @@ export class ListPage implements OnInit {
           error: (error) => console.error('Error cargando canciones de la lista:', error),
         });
       });
+
+
+      //bloque para android
+      if(Capacitor.getPlatform() === 'android'){
+      this.apiService.getSongsFromPlaylist(this.id).subscribe({
+        next: (songsFromPlaylist) => {
+          const songIds = songsFromPlaylist.map(song => song.id!);
+          this.musicService.listSongs().then(songs => {
+            this.songs = songs.filter(song => song.id && songIds.includes(song.id));
+          });
+        },
+        error: (error) => console.error('Error cargando canciones de la lista en Android:', error),
+      });
+    }
     }
   showAddSongs(){
     console.log(this.songs);
@@ -54,6 +71,24 @@ export class ListPage implements OnInit {
         path: song.path,
         duration: song.duration || 0,
       },
+    });
+  }
+
+  removeSong(song: Song) {
+    if (!song.id) {
+      this.mensaje = 'La canción no tiene ID válido';
+      return;
+    }
+
+    this.apiService.removeSongFromPlaylist(this.id, song.id).subscribe({
+      next: (updatedPlaylist) => {
+        this.songs = this.songs.filter(s => s.id !== song.id);
+        this.mensaje = 'Canción eliminada de la lista';
+      },
+      error: (error) => {
+        console.error('Error eliminando canción:', error);
+        this.mensaje = 'Error al eliminar la canción';
+      }
     });
   }
 

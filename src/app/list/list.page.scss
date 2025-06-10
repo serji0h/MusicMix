@@ -1,3 +1,4 @@
+/* Mantener estilos de botones sin cambios */
 button {
   display: flex;
   align-items: center;
@@ -9,7 +10,7 @@ button {
   padding: 10px 20px;
   border-radius: 100px;
   font-size: large;
-  gap: 10px; //espacio entre iconi y texto
+  gap: 10px;
 }
 
 .button {
@@ -17,3 +18,97 @@ button {
   justify-content: center;
   margin-bottom: 30px;
 }
+
+ion-button {
+  width: 50px;
+  height: 50px;
+}
+
+/* Centrar verticalmente en el toolbar */
+ion-toolbar {
+  display: flex;
+  align-items: center;
+}
+
+ion-buttons {
+  display: flex;
+  align-items: center;
+
+}
+ion-back-button{
+  padding-top: 15px;
+}
+
+/* Imagen de la playlist */
+.playlist-cover {
+  width: 160px;
+  height: 160px;
+  margin: 16px auto;
+  display: block;
+  object-fit: cover;
+}
+
+/* Contenedor de cada canción */
+.container-song {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 12px 16px;
+}
+
+.playable-btn {
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
+  width: 70%;
+  cursor: pointer;
+}
+
+ion-label {
+  flex: 1;
+  min-width: 0;
+  padding: 0;
+  padding-left: 20px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+ion-label h6 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: normal;
+}
+
+.remove-song {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+}
+
+
+.remove-song ion-icon {
+  font-size: 25px;
+  color: red;
+  padding-top: 10px;
+}
+
+
+
+  .container-song {
+    padding: 10px 12px;
+  }
+
+  .playable-btn {
+    width: 65%;
+  }
+
+  ion-label h6 {
+    font-size: 16px;
+  }
+
+  .button {
+    margin-bottom: 20px;
+  }
+

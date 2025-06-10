@@ -11,13 +11,21 @@ import { searchOutline } from 'ionicons/icons';
   templateUrl: './spotify.page.html',
   styleUrls: ['./spotify.page.scss'],
   standalone: true,
-  imports: [IonBackButton, IonButtons, IonCardContent, IonCardTitle, IonCardHeader, IonCard, IonIcon, IonButton,IonInput, IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule]
+  imports: [IonBackButton, IonButtons, IonCardContent, IonCardTitle, IonCardHeader, IonCard, IonIcon,IonInput, IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule]
 })
 export class SpotifyPage implements OnInit {
   currentPreviewUrl: string | null = null;
   audio = new Audio();
   query : string = '';
   tracks : any[] = [];
+
+
+  player: any;
+  deviceId: string = '';
+  token: string = '';
+
+
+
 
   async searchTracks() {
     if (!this.query || this.query.trim() === '') {
@@ -53,30 +61,82 @@ export class SpotifyPage implements OnInit {
     }
   }
 
-  playPreview(track: any) {
-    console.log('Reproduciendo vista previa de la canción:', track.name);
-    console.log('URL de vista previa:', track.preview_url);
-    if (this.currentPreviewUrl === track.preview_url) {
-      this.audio.pause();
-      this.currentPreviewUrl = null;
+  async playTrack(track: any) {
+    if (!track.uri || !this.deviceId) {
+      alert('No se puede reproducir esta canción');
       return;
     }
 
-    if (track.preview_url) {
-      this.audio.src = track.preview_url;
-      this.audio.play();
-      this.currentPreviewUrl = track.preview_url;
-    } else {
-      alert('Esta canción no tiene vista previa 😢');
+    try {
+      await fetch(`https://api.spotify.com/v1/me/player/play?device_id=${this.deviceId}`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${this.token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          uris: [track.uri]
+        })
+      });
+
+      console.log(`Reproduciendo ${track.name}`);
+    } catch (error) {
+      console.error('Error al reproducir la canción:', error);
     }
   }
 
   constructor() {
-    addIcons({
-      searchOutline})
+    (window as any).onSpotifyWebPlaybackSDKReady = this.initializeSpotifyPlayer.bind(this);
+    addIcons({searchOutline})
    }
 
-  ngOnInit() {
+   ngOnInit() {
+    this.token = localStorage.getItem('access_token') || '';
+    this.loadSpotifySDK();
   }
+
+  loadSpotifySDK() {
+    const script = document.createElement('script');
+    script.src = 'https://sdk.scdn.co/spotify-player.js';
+    script.onload = () => this.initializeSpotifyPlayer();
+    document.body.appendChild(script);
+  }
+
+
+  initializeSpotifyPlayer() {
+    this.player = new (window as any).Spotify.Player({
+      name: 'Reproductor Ionic',
+      getOAuthToken: (cb: (arg0: string) => any) => cb(this.token),
+      volume: 0.8
+    });
+
+    this.player.addListener('ready', ({ device_id }: any) => {
+      console.log('✅ Reproductor listo con ID:', device_id);
+      this.deviceId = device_id;
+      this.transferPlaybackHere();
+    });
+
+    this.player.addListener('initialization_error', ({ message }: any) => console.error('Error de inicialización', message));
+    this.player.addListener('authentication_error', ({ message }: any) => console.error('Error de autenticación', message));
+    this.player.addListener('account_error', ({ message }: any) => console.error('Error de cuenta', message));
+    this.player.addListener('playback_error', ({ message }: any) => console.error('Error de reproducción', message));
+
+    this.player.connect();
+  }
+
+  transferPlaybackHere() {
+    fetch('https://api.spotify.com/v1/me/player', {
+      method: 'PUT',
+      headers: {
+        'Authorization': `Bearer ${this.token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        device_ids: [this.deviceId],
+        play: false
+      })
+    });
+  }
+
 
 }

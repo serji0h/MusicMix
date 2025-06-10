@@ -12,7 +12,8 @@ import { Router } from '@angular/router';
 export class Tab2Page implements OnInit {
   clientId = 'f6719599957446eba0db490a9728d99f';
   redirectUri = 'http://127.0.0.1:8100/tabs/tab2';
-  scope = 'user-read-private user-read-email playlist-read-private';
+  //los permismos que se le van a solicitar al usuario
+  scope = 'user-read-email streaming user-read-private user-modify-playback-state user-read-playback-state';
 
   constructor(private router: Router) {}
 

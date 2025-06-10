@@ -6,19 +6,19 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { ApiService } from '../services/api-service.service'; // Ajusta la ruta
 import { MusicService } from '../services/music.service'; // Ajusta la ruta
-
+import { RouterLink } from '@angular/router';
 @Component({
   selector: 'app-login',
   templateUrl: './login.page.html',
   styleUrls: ['./login.page.scss'],
   standalone: true,
-  imports: [IonToast, IonInput, IonButton, IonLabel, IonItem, IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule]
+  imports: [IonToast, IonInput, IonButton, IonLabel, IonItem, IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule, RouterLink]
 })
 export class LoginPage implements OnInit {
   email: string = '';
   contrasena: string = '';
   mensaje: string = '';
-  private apiUrl = 'https://localhost:8443/api/auth';
+  private apiUrl = 'https://musicmixback.onrender.com/api/auth';
 
   constructor(
     private http: HttpClient,

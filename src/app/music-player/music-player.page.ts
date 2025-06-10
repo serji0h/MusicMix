@@ -37,21 +37,21 @@ export class MusicPlayerPage implements OnInit, OnDestroy {
       this.isPlaying = true;
       this.player.setDuration(this.duration);
       this.duration = await this.player.getDuration();
-      if (this.duration === 0) {
+      if (this.duration == 0) {
         this.duration = 300; //valor por defecto
         this.player.setDuration(this.duration);
       }
+      this.songName = this.extractMetadataFromName(this.songName).title;
       console.log('Duration from service:', this.duration);
     });
 
     this.interval = setInterval(async () => {
       if (this.isPlaying) {
         this.currentTime = await this.player.getCurrentTime();
-        console.log('Current time:', this.currentTime);
       }
     }, 500);
   }
-
+//cuando acaba
   ngOnDestroy() {
     if (this.interval) {
       clearInterval(this.interval);

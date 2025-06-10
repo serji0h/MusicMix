@@ -9,7 +9,7 @@ import { ApiService, Song, Playlist } from './api-service.service';
 })
 export class MusicService {
   songsWeb: Song[] = [];
-  private userId: number | null = null; // Almacena el ID del usuario autenticado
+  private userId: number | null = null;
   private PlaylistsWeb: Playlist[] = [];
 
   constructor(private apiService: ApiService) {}
@@ -17,7 +17,7 @@ export class MusicService {
   // Nuevo método para recibir el userId desde LoginPage
   setUserId(userId: number) {
     this.userId = userId;
-    this.apiService.setUserId(userId); // Pasa el userId a ApiService
+    this.apiService.setUserId(userId); //pasa el id al apiservice
   }
 
   async listSongs(): Promise<Song[]> {
@@ -52,35 +52,33 @@ export class MusicService {
               try {
                 await NativeAudio.preload({
                   assetId,
-                  assetPath: encodeURI(fileUri),
+                  assetPath: encodeURI(fileUri),//para que no se rompa el formato, que si no se lia con los espacios
                   isUrl: true,
                   audioChannelNum: 1,
                 });
-                const durationResult = await NativeAudio.getDuration({
-                  assetId,
-                });
+                const durationResult = await NativeAudio.getDuration({assetId});
                 duration = durationResult.duration || 0;
                 await NativeAudio.unload({ assetId }).catch(() => {});
               } catch (e) {
                 console.error(`Error obteniendo duración para ${file.name}:`, e);
-                duration = 0; // si falla se pone a 0
+                duration = 0; //si falla se pone a 0
               }
             }
-            // extrae datos del nombre
+            //extrae datos del nombre
             const { title, artist } = this.extractMetadataFromName(file.name);
-            // como no se puede obtener el album, se pone un valor por defecto
+            //como no consigo obtener el album, se pone un valor por defecto
             const album = 'Unknown Album';
             let songId: number | undefined;
 
             try {
               const response = await this.apiService.createOrGetSong(title, artist, album).toPromise();
-              songId = response.id; // asigna el id de la cancion
+              songId = response.id; //asigna el id de la cancion para usarlo luego en el listado
             } catch (error) {
               console.error(`el titulo es este ${title} con artista ${artist}`);
               console.error(`Error enviando ${file.name} al backend:`, error);
             }
             return {
-              id: songId, // no necesitamos el id para listado
+              id: songId,
               nombre: file.name,
               path: fileUri,
               duration,

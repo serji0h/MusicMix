@@ -17,4 +17,7 @@
 
   <ion-button expand="full" id="iniciarSesion" (click)="iniciarSesion()">Iniciar Sesión</ion-button>
   <ion-toast trigger="iniciarSesion" [message]="mensaje" duration="2000"></ion-toast>
+  <div class="register-link">
+    <a [routerLink]="['/register']" routerLinkActive="router-link-active">No tengo cuenta registrada</a>
+  </div>
 </ion-content>
